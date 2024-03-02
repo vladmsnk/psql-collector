@@ -7,15 +7,19 @@ import (
 	"github.com/samber/lo"
 	"log"
 	"strconv"
+	"sync"
 )
 
 type Collector interface {
 	CollectKnobs(ctx context.Context) ([]Knob, error)
 	CollectMetrics(ctx context.Context)
+	SetKnobs(knobs []Knob)
 }
 
 type Implementation struct {
-	db *sql.DB
+	db    *sql.DB
+	knobs []Knob
+	mu    sync.Mutex
 }
 
 func NewCollector(db *sql.DB) *Implementation {
@@ -49,7 +53,13 @@ From pg_settings
 			//on current implementation step, does not collect enum settings.
 			continue
 		case "bool":
-			value, err = strconv.ParseBool(setting)
+			if setting == "on" {
+				value = true
+			} else if setting == "off" {
+				value = false
+			} else {
+				err = fmt.Errorf("unknown value=%s for name=%s", setting, name)
+			}
 		case "integer", "real":
 			value, err = strconv.ParseFloat(setting, 64)
 		case "string":
@@ -73,4 +83,14 @@ From pg_settings
 
 func (i *Implementation) CollectMetrics(ctx context.Context) {
 
+}
+
+func (i *Implementation) SetKnobs(knobs []Knob) {
+	if i == nil {
+		return
+	}
+
+	i.mu.Lock()
+	defer i.mu.Unlock()
+	i.knobs = knobs
 }

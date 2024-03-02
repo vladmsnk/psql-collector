@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package collector;
+
+option go_package = "pkg/pb";
+
+service Collector {
+  //Collects PostgreSQL knobs
+  rpc CollectKnobs(CollectKnobsRequest) returns (CollectKnobsResponse);
+}
+
+message CollectKnobsRequest {}
+
+message CollectKnobsResponse {
+  message Knob {
+    string name = 1;
+
+    oneof value {
+      string str_value = 2;
+      float float_value = 3;
+      bool bool_value = 4;
+    }
+  }
+  repeated Knob knobs = 1;
+}

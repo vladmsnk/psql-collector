@@ -1,10 +1,14 @@
 package main
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	_ "github.com/lib/pq"
 	"log"
+	"postgresHelper/collector"
+	"postgresHelper/runner"
+	"time"
 )
 
 const (
@@ -37,4 +41,10 @@ func main() {
 	}
 	defer conn.Close()
 
+	cl := collector.NewCollector(conn)
+
+	run := runner.New(cl)
+	run.Run(context.Background())
+
+	time.Sleep(time.Minute * 10)
 }
