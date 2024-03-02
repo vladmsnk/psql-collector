@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"postgresHelper/collector"
+	"postgresHelper/model"
 	"time"
 )
 
@@ -18,17 +18,23 @@ type Runner interface {
 
 type Implementation struct {
 	collect         Collector
+	storage         Storager
 	collectInterval time.Duration
 }
 
 type Collector interface {
-	CollectKnobs(ctx context.Context) ([]collector.Knob, error)
-	SetKnobs([]collector.Knob)
+	CollectKnobs(ctx context.Context) ([]model.Knob, error)
 }
 
-func New(collect Collector) *Implementation {
+type Storager interface {
+	SetKnobs(knobs []model.Knob)
+	GetKnobs() []model.Knob
+}
+
+func New(collect Collector, storage Storager) *Implementation {
 	return &Implementation{
 		collect:         collect,
+		storage:         storage,
 		collectInterval: defaultCollectInterval,
 	}
 }
@@ -48,7 +54,7 @@ func (i *Implementation) Run(ctx context.Context) {
 					log.Println(err)
 					continue
 				}
-				i.collect.SetKnobs(knobs)
+				i.storage.SetKnobs(knobs)
 				fmt.Println("Collected knobs")
 			}
 		}

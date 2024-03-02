@@ -6,27 +6,24 @@ import (
 	"fmt"
 	"github.com/samber/lo"
 	"log"
+	"postgresHelper/model"
 	"strconv"
-	"sync"
 )
 
 type Collector interface {
-	CollectKnobs(ctx context.Context) ([]Knob, error)
+	CollectKnobs(ctx context.Context) ([]model.Knob, error)
 	CollectMetrics(ctx context.Context)
-	SetKnobs(knobs []Knob)
 }
 
 type Implementation struct {
-	db    *sql.DB
-	knobs []Knob
-	mu    sync.Mutex
+	db *sql.DB
 }
 
 func NewCollector(db *sql.DB) *Implementation {
 	return &Implementation{db: db}
 }
 
-func (i *Implementation) CollectKnobs(ctx context.Context) ([]Knob, error) {
+func (i *Implementation) CollectKnobs(ctx context.Context) ([]model.Knob, error) {
 	query := `
 SELECT name, setting, vartype
 From pg_settings
@@ -74,8 +71,8 @@ From pg_settings
 		knobs[name] = value
 	}
 
-	res := lo.MapToSlice(knobs, func(key string, value interface{}) Knob {
-		return Knob{Name: key, Value: value}
+	res := lo.MapToSlice(knobs, func(key string, value interface{}) model.Knob {
+		return model.Knob{Name: key, Value: value}
 	})
 
 	return res, nil
@@ -83,14 +80,4 @@ From pg_settings
 
 func (i *Implementation) CollectMetrics(ctx context.Context) {
 
-}
-
-func (i *Implementation) SetKnobs(knobs []Knob) {
-	if i == nil {
-		return
-	}
-
-	i.mu.Lock()
-	defer i.mu.Unlock()
-	i.knobs = knobs
 }

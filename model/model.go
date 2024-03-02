@@ -1,4 +1,4 @@
-package collector
+package model
 
 type Knob struct {
 	Name  string

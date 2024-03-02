@@ -8,6 +8,7 @@ import (
 	"log"
 	"postgresHelper/collector"
 	"postgresHelper/runner"
+	"postgresHelper/storage"
 	"time"
 )
 
@@ -42,8 +43,9 @@ func main() {
 	defer conn.Close()
 
 	cl := collector.NewCollector(conn)
-
-	run := runner.New(cl)
+	st := storage.New()
+	
+	run := runner.New(cl, st)
 	run.Run(context.Background())
 
 	time.Sleep(time.Minute * 10)
