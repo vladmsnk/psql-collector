@@ -1,0 +1,18 @@
+version: '3.1'
+
+services:
+  db:
+    image: postgres:latest
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: password
+      POSTGRES_USER: user
+      POSTGRES_DB: postgres
+    deploy:
+      resources:
+        limits:
+          cpus: 1
+          memory: 1GB
+
+    ports:
+      - "5432:5432"
