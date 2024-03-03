@@ -1,6 +1,8 @@
 package storage
 
-import "postgresHelper/model"
+import (
+	"postgresHelper/internal/model"
+)
 
 func (s *Storage) GetKnobs() []model.Knob {
 	if s == nil {

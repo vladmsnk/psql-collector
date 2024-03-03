@@ -1,7 +1,7 @@
 package storage
 
 import (
-	"postgresHelper/model"
+	"postgresHelper/internal/model"
 	"sync"
 )
 

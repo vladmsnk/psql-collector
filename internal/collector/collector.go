@@ -4,10 +4,11 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"github.com/samber/lo"
 	"log"
-	"postgresHelper/model"
 	"strconv"
+
+	"github.com/samber/lo"
+	"postgresHelper/internal/model"
 )
 
 type Collector interface {

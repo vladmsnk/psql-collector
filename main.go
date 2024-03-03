@@ -6,9 +6,9 @@ import (
 	"fmt"
 	_ "github.com/lib/pq"
 	"log"
-	"postgresHelper/collector"
-	"postgresHelper/runner"
-	"postgresHelper/storage"
+	"postgresHelper/internal/collector"
+	"postgresHelper/internal/runner"
+	"postgresHelper/internal/storage"
 	"time"
 )
 
@@ -44,7 +44,7 @@ func main() {
 
 	cl := collector.NewCollector(conn)
 	st := storage.New()
-	
+
 	run := runner.New(cl, st)
 	run.Run(context.Background())
 
