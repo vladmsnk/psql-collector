@@ -1,4 +1,4 @@
-package postgres_helper
+package psql_helper
 
 import (
 	"context"
@@ -13,6 +13,12 @@ import (
 type Delivery struct {
 	desc.CollectorServer
 	storage Storager
+}
+
+func New(s Storager) *Delivery {
+	return &Delivery{
+		storage: s,
+	}
 }
 
 type Storager interface {

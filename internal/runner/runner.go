@@ -39,7 +39,9 @@ func New(collect Collector, storage Storager) *Implementation {
 	}
 }
 
-func (i *Implementation) Run(ctx context.Context) {
+func (i *Implementation) Run() {
+	ctx := context.Background()
+
 	go func() {
 		ticker := time.NewTicker(i.collectInterval)
 		defer ticker.Stop()
