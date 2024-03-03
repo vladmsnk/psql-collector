@@ -37,5 +37,6 @@ func main() {
 		log.Fatal(err)
 	}
 	defer grpcServer.Close()
+
 	Lock(make(chan os.Signal, 1))
 }
