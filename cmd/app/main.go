@@ -41,7 +41,7 @@ func main() {
 	}
 	defer grpcServer.Close()
 
-	res, err := collect.CollectQueryTypesDistribution(context.Background())
+	res, err := collect.CollectTablesInfo(context.Background())
 	if err != nil {
 		log.Fatal(err)
 	}

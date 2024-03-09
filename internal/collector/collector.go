@@ -104,3 +104,41 @@ func (i *Implementation) CollectQueryTypesDistribution(ctx context.Context) (map
 	}
 	return distribution, nil
 }
+
+func (i *Implementation) CollectTablesInfo(ctx context.Context) ([]TableStat, error) {
+	rows, err := i.db.QueryContext(ctx, SelectTablesInfo)
+	if err != nil {
+		return nil, fmt.Errorf("i.db.QueryContext: %w", err)
+	}
+	defer rows.Close()
+
+	var tablesInfo []TableStat
+	for rows.Next() {
+		var t TableStat
+		err := rows.Scan(
+			&t.RelationID,
+			&t.RelationName,
+			&t.NumberOfLiveTuples,
+			&t.NumberOfDeadTuples,
+			&t.NumberOfSeqScans,
+			&t.NumberOfIndexScans,
+			&t.NumberOfInserts,
+			&t.NumberOfUpdates,
+			&t.NumberOfDeletes,
+			&t.LastVacuumTime,
+			&t.LastAutoVacuumTime,
+			&t.LastAnalyzeTime,
+			&t.LastAutoAnalyze,
+		)
+		if err != nil {
+			return nil, fmt.Errorf("rows.Scan: %w", err)
+		}
+		//Skip adding info about migration table
+		if t.RelationName == "goose_db_version" {
+			continue
+		}
+		tablesInfo = append(tablesInfo, t)
+	}
+
+	return tablesInfo, nil
+}
