@@ -4,6 +4,7 @@ services:
   db:
     image: postgres:latest
     restart: always
+    command: postgres -c shared_preload_libraries=pg_stat_statements -c pg_stat_statements.track=all
     environment:
       POSTGRES_PASSWORD: password
       POSTGRES_USER: user
@@ -11,8 +12,8 @@ services:
     deploy:
       resources:
         limits:
-          cpus: 1
-          memory: 1GB
+          cpus: '1'
+          memory: '1GB'
 
     ports:
       - "5432:5432"

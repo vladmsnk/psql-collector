@@ -82,3 +82,25 @@ From pg_settings
 func (i *Implementation) CollectMetrics(ctx context.Context) {
 
 }
+
+func (i *Implementation) CollectQueryTypesDistribution(ctx context.Context) (map[QueryType]int64, error) {
+	rows, err := i.db.QueryContext(ctx, SelectQueryTypesDistribution)
+	if err != nil {
+		return nil, fmt.Errorf("i.db.QueryContext: %w", err)
+	}
+	defer rows.Close()
+
+	distribution := make(map[QueryType]int64)
+	for rows.Next() {
+		var (
+			queryType string
+			count     int64
+		)
+		err := rows.Scan(&queryType, &count)
+		if err != nil {
+			return nil, fmt.Errorf("rows.Scan: %w", err)
+		}
+		distribution[ToQueryType(queryType)] = count
+	}
+	return distribution, nil
+}

@@ -1,6 +1,8 @@
 package main
 
 import (
+	"context"
+	"fmt"
 	_ "github.com/lib/pq"
 	"log"
 	"os"
@@ -28,7 +30,8 @@ func main() {
 	defer conn.Close()
 
 	store := storage.New()
-	run := runner.New(collector.NewCollector(conn), store)
+	collect := collector.NewCollector(conn)
+	run := runner.New(collect, store)
 	run.Run()
 
 	delivery := psql_helper.New(store)
@@ -37,6 +40,15 @@ func main() {
 		log.Fatal(err)
 	}
 	defer grpcServer.Close()
+
+	res, err := collect.CollectQueryTypesDistribution(context.Background())
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println(res)
+	//loader := loader.New(conn)
+	//loader.FillWithTestData(context.Background())
 
 	Lock(make(chan os.Signal, 1))
 }
